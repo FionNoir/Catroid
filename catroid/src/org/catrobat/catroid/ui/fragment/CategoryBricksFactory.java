@@ -142,6 +142,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CategoryBricksFactory {
+	//patrick
+	public boolean beginnerModeEnabled = true;
 
 	public List<Brick> getBricks(String category, Sprite sprite, Context context) {
 
@@ -181,37 +183,54 @@ public class CategoryBricksFactory {
 	}
 
 	private List<Brick> setupControlCategoryList(Context context) {
+
 		List<Brick> controlBrickList = new ArrayList<>();
-		controlBrickList.add(new WhenStartedBrick(null));
-		controlBrickList.add(new WhenBrick(null));
-		controlBrickList.add(new WhenTouchDownBrick());
-		controlBrickList.add(new WaitBrick(BrickValues.WAIT));
 
-		final String broadcastMessage = MessageContainer.getFirst(context);
+		//patrick
+		if (beginnerModeEnabled) {
+			controlBrickList.add(new WhenStartedBrick(null));
+			controlBrickList.add(new WhenTouchDownBrick());
+			controlBrickList.add(new WaitBrick(BrickValues.WAIT));
 
-		controlBrickList.add(new BroadcastReceiverBrick(broadcastMessage));
-		controlBrickList.add(new BroadcastBrick(broadcastMessage));
-		controlBrickList.add(new BroadcastWaitBrick(broadcastMessage));
+			final String broadcastMessage = MessageContainer.getFirst(context);
 
-		controlBrickList.add(new CollisionReceiverBrick("object"));
-
-		controlBrickList.add(new NoteBrick(context.getString(R.string.brick_note_default_value)));
-		controlBrickList.add(new ForeverBrick());
-		FormulaElement defaultIf = new FormulaElement(FormulaElement.ElementType.OPERATOR, Operators.SMALLER_THAN.toString(), null);
-		defaultIf.setLeftChild(new FormulaElement(ElementType.NUMBER, "1", null));
-		defaultIf.setRightChild(new FormulaElement(ElementType.NUMBER, "2", null));
-		controlBrickList.add(new IfLogicBeginBrick(new Formula(defaultIf)));
-		controlBrickList.add(new IfThenLogicBeginBrick(new Formula(defaultIf)));
-		controlBrickList.add(new WaitUntilBrick(new Formula(defaultIf)));
-		controlBrickList.add(new RepeatBrick(BrickValues.REPEAT));
-		controlBrickList.add(new RepeatUntilBrick(new Formula(defaultIf)));
-
-		if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
-			controlBrickList.add(new PhiroIfLogicBeginBrick());
+			controlBrickList.add(new BroadcastReceiverBrick(broadcastMessage));
+			controlBrickList.add(new BroadcastBrick(broadcastMessage));
+			controlBrickList.add(new ForeverBrick());
 		}
+		else {
 
-		if (SettingsActivity.isNfcSharedPreferenceEnabled(context)) {
-			controlBrickList.add(new WhenNfcBrick());
+			controlBrickList.add(new WhenStartedBrick(null));
+			controlBrickList.add(new WhenBrick(null));
+			controlBrickList.add(new WhenTouchDownBrick());
+			controlBrickList.add(new WaitBrick(BrickValues.WAIT));
+
+			final String broadcastMessage = MessageContainer.getFirst(context);
+
+			controlBrickList.add(new BroadcastReceiverBrick(broadcastMessage));
+			controlBrickList.add(new BroadcastBrick(broadcastMessage));
+			controlBrickList.add(new BroadcastWaitBrick(broadcastMessage));
+
+			controlBrickList.add(new CollisionReceiverBrick("object"));
+
+			controlBrickList.add(new NoteBrick(context.getString(R.string.brick_note_default_value)));
+			controlBrickList.add(new ForeverBrick());
+			FormulaElement defaultIf = new FormulaElement(FormulaElement.ElementType.OPERATOR, Operators.SMALLER_THAN.toString(), null);
+			defaultIf.setLeftChild(new FormulaElement(ElementType.NUMBER, "1", null));
+			defaultIf.setRightChild(new FormulaElement(ElementType.NUMBER, "2", null));
+			controlBrickList.add(new IfLogicBeginBrick(new Formula(defaultIf)));
+			controlBrickList.add(new IfThenLogicBeginBrick(new Formula(defaultIf)));
+			controlBrickList.add(new WaitUntilBrick(new Formula(defaultIf)));
+			controlBrickList.add(new RepeatBrick(BrickValues.REPEAT));
+			controlBrickList.add(new RepeatUntilBrick(new Formula(defaultIf)));
+
+			if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
+				controlBrickList.add(new PhiroIfLogicBeginBrick());
+			}
+
+			if (SettingsActivity.isNfcSharedPreferenceEnabled(context)) {
+				controlBrickList.add(new WhenNfcBrick());
+			}
 		}
 
 		return controlBrickList;
@@ -256,46 +275,63 @@ public class CategoryBricksFactory {
 
 	private List<Brick> setupMotionCategoryList(Sprite sprite, Context context) {
 		List<Brick> motionBrickList = new ArrayList<>();
-		motionBrickList.add(new PlaceAtBrick(BrickValues.X_POSITION, BrickValues.Y_POSITION));
-		motionBrickList.add(new SetXBrick(BrickValues.X_POSITION));
-		motionBrickList.add(new SetYBrick(BrickValues.Y_POSITION));
-		motionBrickList.add(new ChangeXByNBrick(BrickValues.CHANGE_X_BY));
-		motionBrickList.add(new ChangeYByNBrick(BrickValues.CHANGE_Y_BY));
 
-		if (!isBackground(sprite)) {
-			motionBrickList.add(new IfOnEdgeBounceBrick());
+		//patrick
+		if (beginnerModeEnabled)
+		{
+			motionBrickList.add(new PlaceAtBrick(BrickValues.X_POSITION, BrickValues.Y_POSITION));
+			if (!isBackground(sprite)) {
+				motionBrickList.add(new IfOnEdgeBounceBrick());
+			}
+			motionBrickList.add(new MoveNStepsBrick(BrickValues.MOVE_STEPS));
+			motionBrickList.add(new TurnLeftBrick(BrickValues.TURN_DEGREES));
+			motionBrickList.add(new TurnRightBrick(BrickValues.TURN_DEGREES));
+			motionBrickList.add(new GlideToBrick(BrickValues.X_POSITION, BrickValues.Y_POSITION,
+					BrickValues.GLIDE_SECONDS));
 		}
+		else
+		{
+			motionBrickList.add(new PlaceAtBrick(BrickValues.X_POSITION, BrickValues.Y_POSITION));
+			motionBrickList.add(new SetXBrick(BrickValues.X_POSITION));
+			motionBrickList.add(new SetYBrick(BrickValues.Y_POSITION));
+			motionBrickList.add(new ChangeXByNBrick(BrickValues.CHANGE_X_BY));
+			motionBrickList.add(new ChangeYByNBrick(BrickValues.CHANGE_Y_BY));
 
-		motionBrickList.add(new MoveNStepsBrick(BrickValues.MOVE_STEPS));
-		motionBrickList.add(new TurnLeftBrick(BrickValues.TURN_DEGREES));
-		motionBrickList.add(new TurnRightBrick(BrickValues.TURN_DEGREES));
-		motionBrickList.add(new PointInDirectionBrick(Direction.RIGHT));
-		motionBrickList.add(new PointToBrick(null));
-		motionBrickList.add(new GlideToBrick(BrickValues.X_POSITION, BrickValues.Y_POSITION,
-				BrickValues.GLIDE_SECONDS));
+			if (!isBackground(sprite)) {
+				motionBrickList.add(new IfOnEdgeBounceBrick());
+			}
 
-		if (!isBackground(sprite)) {
-			motionBrickList.add(new GoNStepsBackBrick(BrickValues.GO_BACK));
-			motionBrickList.add(new ComeToFrontBrick());
-		}
+			motionBrickList.add(new MoveNStepsBrick(BrickValues.MOVE_STEPS));
+			motionBrickList.add(new TurnLeftBrick(BrickValues.TURN_DEGREES));
+			motionBrickList.add(new TurnRightBrick(BrickValues.TURN_DEGREES));
+			motionBrickList.add(new PointInDirectionBrick(Direction.RIGHT));
+			motionBrickList.add(new PointToBrick(null));
+			motionBrickList.add(new GlideToBrick(BrickValues.X_POSITION, BrickValues.Y_POSITION,
+					BrickValues.GLIDE_SECONDS));
 
-		motionBrickList.add(new VibrationBrick(BrickValues.VIBRATE_SECONDS));
+			if (!isBackground(sprite)) {
+				motionBrickList.add(new GoNStepsBackBrick(BrickValues.GO_BACK));
+				motionBrickList.add(new ComeToFrontBrick());
+			}
 
-		motionBrickList.add(new SetPhysicsObjectTypeBrick(BrickValues.PHYSIC_TYPE));
-		motionBrickList.add(new SetVelocityBrick(BrickValues.PHYSIC_VELOCITY));
-		motionBrickList.add(new TurnLeftSpeedBrick(BrickValues.PHYSIC_TURN_DEGREES));
-		motionBrickList.add(new TurnRightSpeedBrick(BrickValues.PHYSIC_TURN_DEGREES));
-		motionBrickList.add(new SetGravityBrick(BrickValues.PHYSIC_GRAVITY));
-		motionBrickList.add(new SetMassBrick(BrickValues.PHYSIC_MASS));
-		motionBrickList.add(new SetBounceBrick(BrickValues.PHYSIC_BOUNCE_FACTOR * 100));
-		motionBrickList.add(new SetFrictionBrick(BrickValues.PHYSIC_FRICTION * 100));
+			motionBrickList.add(new VibrationBrick(BrickValues.VIBRATE_SECONDS));
 
-		if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
-			motionBrickList.add(new PhiroMotorMoveForwardBrick(PhiroMotorMoveForwardBrick.Motor.MOTOR_LEFT,
-					BrickValues.PHIRO_SPEED));
-			motionBrickList.add(new PhiroMotorMoveBackwardBrick(PhiroMotorMoveBackwardBrick.Motor.MOTOR_LEFT,
-					BrickValues.PHIRO_SPEED));
-			motionBrickList.add(new PhiroMotorStopBrick(PhiroMotorStopBrick.Motor.MOTOR_BOTH));
+			motionBrickList.add(new SetPhysicsObjectTypeBrick(BrickValues.PHYSIC_TYPE));
+			motionBrickList.add(new SetVelocityBrick(BrickValues.PHYSIC_VELOCITY));
+			motionBrickList.add(new TurnLeftSpeedBrick(BrickValues.PHYSIC_TURN_DEGREES));
+			motionBrickList.add(new TurnRightSpeedBrick(BrickValues.PHYSIC_TURN_DEGREES));
+			motionBrickList.add(new SetGravityBrick(BrickValues.PHYSIC_GRAVITY));
+			motionBrickList.add(new SetMassBrick(BrickValues.PHYSIC_MASS));
+			motionBrickList.add(new SetBounceBrick(BrickValues.PHYSIC_BOUNCE_FACTOR * 100));
+			motionBrickList.add(new SetFrictionBrick(BrickValues.PHYSIC_FRICTION * 100));
+
+			if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
+				motionBrickList.add(new PhiroMotorMoveForwardBrick(PhiroMotorMoveForwardBrick.Motor.MOTOR_LEFT,
+						BrickValues.PHIRO_SPEED));
+				motionBrickList.add(new PhiroMotorMoveBackwardBrick(PhiroMotorMoveBackwardBrick.Motor.MOTOR_LEFT,
+						BrickValues.PHIRO_SPEED));
+				motionBrickList.add(new PhiroMotorStopBrick(PhiroMotorStopBrick.Motor.MOTOR_BOTH));
+			}
 		}
 
 		return motionBrickList;
@@ -303,23 +339,33 @@ public class CategoryBricksFactory {
 
 	private List<Brick> setupSoundCategoryList(Context context) {
 		List<Brick> soundBrickList = new ArrayList<>();
-		soundBrickList.add(new PlaySoundBrick());
-		soundBrickList.add(new StopAllSoundsBrick());
-		soundBrickList.add(new SetVolumeToBrick(BrickValues.SET_VOLUME_TO));
 
-		// workaround to set a negative default value for a Brick
-		float positiveDefaultValueChangeVolumeBy = Math.abs(BrickValues.CHANGE_VOLUME_BY);
-		FormulaElement defaultValueChangeVolumeBy = new FormulaElement(ElementType.OPERATOR, Operators.MINUS.name(),
-				null, null, new FormulaElement(ElementType.NUMBER, String.valueOf(positiveDefaultValueChangeVolumeBy),
-				null)
-		);
-		soundBrickList.add(new ChangeVolumeByNBrick(new Formula(defaultValueChangeVolumeBy)));
+		if (beginnerModeEnabled)
+		{
+			soundBrickList.add(new PlaySoundBrick());
+			soundBrickList.add(new StopAllSoundsBrick());
+			soundBrickList.add(new SpeakBrick(context.getString(R.string.brick_speak_default_value)));
+		}
+		else
+		{
+			soundBrickList.add(new PlaySoundBrick());
+			soundBrickList.add(new StopAllSoundsBrick());
+			soundBrickList.add(new SetVolumeToBrick(BrickValues.SET_VOLUME_TO));
 
-		soundBrickList.add(new SpeakBrick(context.getString(R.string.brick_speak_default_value)));
+			// workaround to set a negative default value for a Brick
+			float positiveDefaultValueChangeVolumeBy = Math.abs(BrickValues.CHANGE_VOLUME_BY);
+			FormulaElement defaultValueChangeVolumeBy = new FormulaElement(ElementType.OPERATOR, Operators.MINUS.name(),
+					null, null, new FormulaElement(ElementType.NUMBER, String.valueOf(positiveDefaultValueChangeVolumeBy),
+					null)
+			);
+			soundBrickList.add(new ChangeVolumeByNBrick(new Formula(defaultValueChangeVolumeBy)));
 
-		if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
-			soundBrickList.add(new PhiroPlayToneBrick(PhiroPlayToneBrick.Tone.DO,
-					BrickValues.PHIRO_DURATION));
+			soundBrickList.add(new SpeakBrick(context.getString(R.string.brick_speak_default_value)));
+
+			if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
+				soundBrickList.add(new PhiroPlayToneBrick(PhiroPlayToneBrick.Tone.DO,
+						BrickValues.PHIRO_DURATION));
+			}
 		}
 
 		return soundBrickList;
@@ -328,25 +374,39 @@ public class CategoryBricksFactory {
 	private List<Brick> setupLooksCategoryList(Context context) {
 		List<Brick> looksBrickList = new ArrayList<>();
 
-		looksBrickList.add(new SetLookBrick());
-		looksBrickList.add(new NextLookBrick());
-		looksBrickList.add(new CameraBrick());
-		looksBrickList.add(new ChooseCameraBrick());
-		looksBrickList.add(new SetSizeToBrick(BrickValues.SET_SIZE_TO));
-		looksBrickList.add(new ChangeSizeByNBrick(BrickValues.CHANGE_SIZE_BY));
-		looksBrickList.add(new HideBrick());
-		looksBrickList.add(new ShowBrick());
-		looksBrickList.add(new SetTransparencyBrick(BrickValues.SET_TRANSPARENCY));
-		looksBrickList.add(new ChangeTransparencyByNBrick(BrickValues.CHANGE_TRANSPARENCY_EFFECT));
-		looksBrickList.add(new SetBrightnessBrick(BrickValues.SET_BRIGHTNESS_TO));
-		looksBrickList.add(new ChangeBrightnessByNBrick(BrickValues.CHANGE_BRITHNESS_BY));
-		looksBrickList.add(new SetColorBrick(BrickValues.SET_COLOR_TO));
-		looksBrickList.add(new ChangeColorByNBrick(BrickValues.CHANGE_COLOR_BY));
-		looksBrickList.add(new ClearGraphicEffectBrick());
-		looksBrickList.add(new FlashBrick());
+		if (beginnerModeEnabled)
+		{
+			looksBrickList.add(new SetLookBrick());
+			looksBrickList.add(new NextLookBrick());
+			looksBrickList.add(new SetSizeToBrick(BrickValues.SET_SIZE_TO));
+			looksBrickList.add(new ChangeSizeByNBrick(BrickValues.CHANGE_SIZE_BY));
+			looksBrickList.add(new HideBrick());
+			looksBrickList.add(new ShowBrick());
+			looksBrickList.add(new SetColorBrick(BrickValues.SET_COLOR_TO));
+			looksBrickList.add(new ChangeColorByNBrick(BrickValues.CHANGE_COLOR_BY));
+		}
+		else
+		{
+			looksBrickList.add(new SetLookBrick());
+			looksBrickList.add(new NextLookBrick());
+			looksBrickList.add(new CameraBrick());
+			looksBrickList.add(new ChooseCameraBrick());
+			looksBrickList.add(new SetSizeToBrick(BrickValues.SET_SIZE_TO));
+			looksBrickList.add(new ChangeSizeByNBrick(BrickValues.CHANGE_SIZE_BY));
+			looksBrickList.add(new HideBrick());
+			looksBrickList.add(new ShowBrick());
+			looksBrickList.add(new SetTransparencyBrick(BrickValues.SET_TRANSPARENCY));
+			looksBrickList.add(new ChangeTransparencyByNBrick(BrickValues.CHANGE_TRANSPARENCY_EFFECT));
+			looksBrickList.add(new SetBrightnessBrick(BrickValues.SET_BRIGHTNESS_TO));
+			looksBrickList.add(new ChangeBrightnessByNBrick(BrickValues.CHANGE_BRITHNESS_BY));
+			looksBrickList.add(new SetColorBrick(BrickValues.SET_COLOR_TO));
+			looksBrickList.add(new ChangeColorByNBrick(BrickValues.CHANGE_COLOR_BY));
+			looksBrickList.add(new ClearGraphicEffectBrick());
+			looksBrickList.add(new FlashBrick());
 
-		if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
-			looksBrickList.add(new PhiroRGBLightBrick(PhiroRGBLightBrick.Eye.BOTH, BrickValues.PHIRO_VALUE_RED, BrickValues.PHIRO_VALUE_GREEN, BrickValues.PHIRO_VALUE_BLUE));
+			if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
+				looksBrickList.add(new PhiroRGBLightBrick(PhiroRGBLightBrick.Eye.BOTH, BrickValues.PHIRO_VALUE_RED, BrickValues.PHIRO_VALUE_GREEN, BrickValues.PHIRO_VALUE_BLUE));
+			}
 		}
 
 		return looksBrickList;
@@ -354,14 +414,26 @@ public class CategoryBricksFactory {
 
 	private List<Brick> setupDataCategoryList() {
 		List<Brick> dataBrickList = new ArrayList<>();
-		dataBrickList.add(new SetVariableBrick(BrickValues.SET_VARIABLE));
-		dataBrickList.add(new ChangeVariableBrick(BrickValues.CHANGE_VARIABLE));
-		dataBrickList.add(new ShowTextBrick(BrickValues.X_POSITION, BrickValues.Y_POSITION));
-		dataBrickList.add(new HideTextBrick());
-		dataBrickList.add(new AddItemToUserListBrick(BrickValues.ADD_ITEM_TO_USERLIST));
-		dataBrickList.add(new DeleteItemOfUserListBrick(BrickValues.DELETE_ITEM_OF_USERLIST));
-		dataBrickList.add(new InsertItemIntoUserListBrick(BrickValues.INSERT_ITEM_INTO_USERLIST_VALUE, BrickValues.INSERT_ITEM_INTO_USERLIST_INDEX));
-		dataBrickList.add(new ReplaceItemInUserListBrick(BrickValues.REPLACE_ITEM_IN_USERLIST_VALUE, BrickValues.REPLACE_ITEM_IN_USERLIST_INDEX));
+
+		if (beginnerModeEnabled)
+		{
+			dataBrickList.add(new SetVariableBrick(BrickValues.SET_VARIABLE));
+			dataBrickList.add(new ChangeVariableBrick(BrickValues.CHANGE_VARIABLE));
+			dataBrickList.add(new ShowTextBrick(BrickValues.X_POSITION, BrickValues.Y_POSITION));
+			dataBrickList.add(new HideTextBrick());
+		}
+		else
+		{
+			dataBrickList.add(new SetVariableBrick(BrickValues.SET_VARIABLE));
+			dataBrickList.add(new ChangeVariableBrick(BrickValues.CHANGE_VARIABLE));
+			dataBrickList.add(new ShowTextBrick(BrickValues.X_POSITION, BrickValues.Y_POSITION));
+			dataBrickList.add(new HideTextBrick());
+			dataBrickList.add(new AddItemToUserListBrick(BrickValues.ADD_ITEM_TO_USERLIST));
+			dataBrickList.add(new DeleteItemOfUserListBrick(BrickValues.DELETE_ITEM_OF_USERLIST));
+			dataBrickList.add(new InsertItemIntoUserListBrick(BrickValues.INSERT_ITEM_INTO_USERLIST_VALUE, BrickValues.INSERT_ITEM_INTO_USERLIST_INDEX));
+			dataBrickList.add(new ReplaceItemInUserListBrick(BrickValues.REPLACE_ITEM_IN_USERLIST_VALUE, BrickValues.REPLACE_ITEM_IN_USERLIST_INDEX));
+		}
+
 		return dataBrickList;
 	}
 
