@@ -1,5 +1,5 @@
 <application>
   <component name="TerminalOptionsProvider">
-    <option name="myShellPath" value="C:\Users\patrick\AppData\Local\GitHub\GitHub.appref-ms --open-shel" />
+    <option name="myShellPath" value="C:\Users\patrick\AppData\Local\GitHub\GitHub.appref-ms.exe --open-shel" />
   </component>
 </application>
